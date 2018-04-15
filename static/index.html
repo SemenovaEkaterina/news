@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru" lang="ru">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro" rel="stylesheet">
+    <style>
+        html {
+            font-family: 'Source Sans Pro', sans-serif;
+        }
+
+        body {
+            padding: 0 20px;
+        }
+
+        form {
+            font-size: 18px;
+            color: #848d95;
+            background: #f9f9f9;
+            border: 1px solid #d4d4d4;
+            box-shadow: -1px 1px #f2f2f2;
+            padding: 7px 10px 9px;
+
+        }
+
+        label {
+            margin-right: 10px;
+        }
+
+        input {
+            margin-right: 20px;
+        }
+
+        button {
+            color: black;
+            font-size: 16px;
+            background: white;
+        }
+
+        table {
+            padding: 5px;
+            font-size: 18px;
+            margin-top: 20px;
+            width: 100%;
+            color: #434850;
+            background: #f9f9f9;
+            border: 1px solid #d4d4d4;
+        }
+
+        tr:first-child {
+            font-weight: bold;
+            padding-bottom: 10px;
+        }
+
+        .error {
+            color: red;
+            display: inline-block;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<h1>НОВОСТИ</h1>
+<form method="post" action="/" id="form">
+    <label for="login">Логин</label>
+    <input name="login" id="login"/>
+    <label for="password">Пароль</label>
+    <input name="password" id="password"/>
+
+    <label for="text">Текст</label>
+    <input name="text" id="text"/>
+
+    <button type="submit">Добавить</button>
+
+    <div class="error" id="error"></div>
+</form>
+
+<page>
+    <table>
+        <tr>
+            <td>Автор</td>
+            <td>Новость</td>
+        </tr>
+        {% for record in records %}
+        <tr>
+            <td>{{record.0}}</td>
+            <td>{{record.1}}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</page>
+</body>
+
+
+<script>
+    document.getElementById('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/');
+
+        xhr.onload = function (e) {
+
+            if (xhr.status !== 200 || xhr.responseText === "") {
+                document.getElementById("error").innerText = 'НЕВЕРНО';
+
+            } else {
+                var data = xhr.responseText;
+                var body = data.substring(data.indexOf("<page>") + 6, data.indexOf("</page>"));
+                document.getElementsByTagName('page')[0].innerHTML = body;
+            }
+        };
+
+        xhr.send(JSON.stringify({login: this.login.value, password: this.password.value, text: this.text.value}));
+
+
+    });
+
+    document.getElementsByTagName('input')[0].addEventListener('focus', function (ev) {
+        document.getElementById("error").innerText = '';
+    });
+
+    document.getElementsByTagName('input')[1].addEventListener('focus', function (ev) {
+        document.getElementById("error").innerText = '';
+    });
+
+</script>
+</html>
